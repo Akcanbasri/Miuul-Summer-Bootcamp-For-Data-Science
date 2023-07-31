@@ -212,112 +212,412 @@ num_cols = [col for col in num_cols if col not in "SK_ID_CURR"]
 for col in num_cols:
     print(col, check_outlier(dff, col))
 
+###################
+# Aykırı Değerlerin Kendilerine Erişmek
+###################
 
-# Aykırı değerlerin kendine erişmek
-def grab_outlier(dataframe, col_name, index=False):
+
+def grab_outliers(dataframe, col_name, index=False):
     low, up = outlier_thresholds(dataframe, col_name)
 
-    if len(dataframe[((dataframe[col_name] < low) | (dataframe[col_name] > up))]) > 10:
+    if (
+        dataframe[((dataframe[col_name] < low) | (dataframe[col_name] > up))].shape[0]
+        > 10
+    ):
         print(
-            dataframe[((dataframe[col_name] < low)) | (dataframe[col_name] > up)].head()
+            dataframe[((dataframe[col_name] < low) | (dataframe[col_name] > up))].head()
         )
     else:
-        dataframe[((dataframe[col_name] < low)) | (dataframe[col_name] > up)]
+        print(dataframe[((dataframe[col_name] < low) | (dataframe[col_name] > up))])
 
     if index:
         outlier_index = dataframe[
-            ((dataframe[col_name] < low)) | (dataframe[col_name] > up)
+            ((dataframe[col_name] < low) | (dataframe[col_name] > up))
         ].index
         return outlier_index
 
 
-age_index = grab_outlier(df, "Age", True)
+grab_outliers(df, "Age")
+
+grab_outliers(df, "Age", True)
+
+age_index = grab_outliers(df, "Age", True)
 
 
 outlier_thresholds(df, "Age")
 check_outlier(df, "Age")
-grab_outlier(df, "Age", True)
+grab_outliers(df, "Age", True)
 
-# Aykırı Değerleri silme
+#############################################
+# Aykırı Değer Problemini Çözme
+#############################################
+
+###################
+# Silme
+###################
 
 low, up = outlier_thresholds(df, "Fare")
-
-df.shape  # 891 gözlem
-
+df.shape
 
 df[~((df["Fare"] < low) | (df["Fare"] > up))].shape
 
 
 def remove_outlier(dataframe, col_name):
     low_limit, up_limit = outlier_thresholds(dataframe, col_name)
-    df_without_outlier = dataframe[
+    df_without_outliers = dataframe[
         ~((dataframe[col_name] < low_limit) | (dataframe[col_name] > up_limit))
     ]
-
-    return df_without_outlier
+    return df_without_outliers
 
 
 cat_cols, num_cols, cat_but_car = grab_col_names(df)
 
 num_cols = [col for col in num_cols if col not in "PassengerId"]
 
-df.shape  # 891 gözlem var
+df.shape
 
 for col in num_cols:
     new_df = remove_outlier(df, col)
 
-new_df.shape  # 775 gözleme düştü
+df.shape[0] - new_df.shape[0]
 
-# !!!!!! bir numeric değer varsa o satır tamamen siliniyor.
-
-
-########################################################
-# Baskılama yöntemi(re-assignment with threashold)
-########################################################
+###################
+# Baskılama Yöntemi (re-assignment with thresholds)
+###################
 
 low, up = outlier_thresholds(df, "Fare")
-
 
 df[((df["Fare"] < low) | (df["Fare"] > up))]["Fare"]
 
 df.loc[((df["Fare"] < low) | (df["Fare"] > up)), "Fare"]
 
 df.loc[(df["Fare"] > up), "Fare"] = up
+
 df.loc[(df["Fare"] < low), "Fare"] = low
 
 
-def replaace_with_threasholds(dataframe, col_name):
-    low_limit, up_limit = outlier_thresholds(dataframe, col_name)
-    dataframe.loc[(dataframe[col_name] > up_limit), col_name] = up_limit
-    dataframe.loc[(dataframe[col_name] < low_limit), col_name] = low_limit
+def replace_with_thresholds(dataframe, variable):
+    low_limit, up_limit = outlier_thresholds(dataframe, variable)
+    dataframe.loc[(dataframe[variable] < low_limit), variable] = low_limit
+    dataframe.loc[(dataframe[variable] > up_limit), variable] = up_limit
 
 
 df = load()
-df.shape
 cat_cols, num_cols, cat_but_car = grab_col_names(df)
 num_cols = [col for col in num_cols if col not in "PassengerId"]
 
-for col in num_cols:
-    print(col, check_outlier(df, col))  # True
-
-# sınırlarla outlier değerleri dolduruyoruz.
-for col in num_cols:
-    replaace_with_threasholds(df, col)
+df.shape
 
 for col in num_cols:
-    print(col, check_outlier(df, col))  # False
+    print(col, check_outlier(df, col))
+
+for col in num_cols:
+    replace_with_thresholds(df, col)
+
+for col in num_cols:
+    print(col, check_outlier(df, col))
 
 
-#####################################################
+###################
 # Recap
-#####################################################
+###################
 
 df = load()
 outlier_thresholds(df, "Age")
-check_outlier(df, "Age") # True yani outlier var demek
-grab_outlier(df, "Age", True)
+check_outlier(df, "Age")
+grab_outliers(df, "Age", index=True)
 
-remove_outlier(df, "Age").shape  # outlier değerleri direk çıkarır
-replaace_with_threasholds(df, "Age")  # sınır değerleri ouytlier üzerine yazar.
+remove_outlier(df, "Age").shape
+replace_with_thresholds(df, "Age")
+check_outlier(df, "Age")
 
-check_outlier(df, "Age") # False Outlier değerler yok 
+
+#############################################
+# Çok Değişkenli Aykırı Değer Analizi: Local Outlier Factor
+#############################################
+
+# 17, 3
+
+df = sns.load_dataset("diamonds")
+df = df.select_dtypes(include=["float64", "int64"])
+df = df.dropna()
+df.head()
+df.shape
+for col in df.columns:
+    print(col, check_outlier(df, col))
+
+
+low, up = outlier_thresholds(df, "carat")
+
+df[((df["carat"] < low) | (df["carat"] > up))].shape
+
+low, up = outlier_thresholds(df, "depth")
+
+df[((df["depth"] < low) | (df["depth"] > up))].shape
+
+clf = LocalOutlierFactor(n_neighbors=20)
+clf.fit_predict(df)
+
+df_scores = clf.negative_outlier_factor_
+df_scores[0:5]
+# df_scores = -df_scores
+np.sort(df_scores)[0:5]
+
+scores = pd.DataFrame(np.sort(df_scores))
+scores.plot(stacked=True, xlim=[0, 50], style=".-")
+plt.show()
+
+th = np.sort(df_scores)[3]
+
+df[df_scores < th]
+
+df[df_scores < th].shape
+
+
+df.describe([0.01, 0.05, 0.75, 0.90, 0.99]).T
+
+df[df_scores < th].index
+
+df[df_scores < th].drop(axis=0, labels=df[df_scores < th].index)
+
+
+#############################################
+# Missing Values (Eksik Değerler)
+#############################################
+
+#############################################
+# Eksik Değerlerin Yakalanması
+#############################################
+
+df = load()
+df.head()
+
+# eksik gozlem var mı yok mu sorgusu
+df.isnull().values.any()
+
+# degiskenlerdeki eksik deger sayisi
+df.isnull().sum()
+
+# degiskenlerdeki tam deger sayisi
+df.notnull().sum()
+
+# veri setindeki toplam eksik deger sayisi
+df.isnull().sum().sum()
+
+# en az bir tane eksik degere sahip olan gözlem birimleri
+df[df.isnull().any(axis=1)]
+
+# tam olan gözlem birimleri
+df[df.notnull().all(axis=1)]
+
+# Azalan şekilde sıralamak
+df.isnull().sum().sort_values(ascending=False)
+
+(df.isnull().sum() / df.shape[0] * 100).sort_values(ascending=False)
+
+na_cols = [col for col in df.columns if df[col].isnull().sum() > 0]
+
+
+def missing_values_table(dataframe, na_name=False):
+    na_columns = [col for col in dataframe.columns if dataframe[col].isnull().sum() > 0]
+
+    n_miss = dataframe[na_columns].isnull().sum().sort_values(ascending=False)
+    ratio = (
+        dataframe[na_columns].isnull().sum() / dataframe.shape[0] * 100
+    ).sort_values(ascending=False)
+    missing_df = pd.concat(
+        [n_miss, np.round(ratio, 2)], axis=1, keys=["n_miss", "ratio"]
+    )
+    print(missing_df, end="\n")
+
+    if na_name:
+        return na_columns
+
+
+missing_values_table(df)
+
+missing_values_table(df, True)
+
+
+#############################################
+# Eksik Değer Problemini Çözme
+#############################################
+
+missing_values_table(df)
+
+###################
+# Çözüm 1: Hızlıca silmek
+###################
+df.dropna().shape
+
+###################
+# Çözüm 2: Basit Atama Yöntemleri ile Doldurmak
+###################
+
+df["Age"].fillna(df["Age"].mean()).isnull().sum()
+df["Age"].fillna(df["Age"].median()).isnull().sum()
+df["Age"].fillna(0).isnull().sum()
+
+# df.apply(lambda x: x.fillna(x.mean()), axis=0)
+
+df.apply(lambda x: x.fillna(x.mean()) if x.dtype != "O" else x, axis=0).head()
+
+dff = df.apply(lambda x: x.fillna(x.mean()) if x.dtype != "O" else x, axis=0)
+
+dff.isnull().sum().sort_values(ascending=False)
+
+df["Embarked"].fillna(df["Embarked"].mode()[0]).isnull().sum()
+
+df["Embarked"].fillna("missing")
+
+df.apply(
+    lambda x: x.fillna(x.mode()[0])
+    if (x.dtype == "O" and len(x.unique()) <= 10)
+    else x,
+    axis=0,
+).isnull().sum()
+
+###################
+# Kategorik Değişken Kırılımında Değer Atama
+###################
+
+
+df.groupby("Sex")["Age"].mean()
+
+df["Age"].mean()
+
+df["Age"].fillna(df.groupby("Sex")["Age"].transform("mean")).isnull().sum()
+
+df.groupby("Sex")["Age"].mean()["female"]
+
+df.loc[(df["Age"].isnull()) & (df["Sex"] == "female"), "Age"] = df.groupby("Sex")[
+    "Age"
+].mean()["female"]
+
+df.loc[(df["Age"].isnull()) & (df["Sex"] == "male"), "Age"] = df.groupby("Sex")[
+    "Age"
+].mean()["male"]
+
+df.isnull().sum()
+
+#############################################
+# Çözüm 3: Tahmine Dayalı Atama ile Doldurma
+#############################################
+
+df = load()
+
+cat_cols, num_cols, cat_but_car = grab_col_names(df)
+num_cols = [col for col in num_cols if col not in "PassengerId"]
+dff = pd.get_dummies(df[cat_cols + num_cols], drop_first=True)
+
+dff.head()
+
+# değişkenlerin standartlatırılması
+scaler = MinMaxScaler()
+dff = pd.DataFrame(scaler.fit_transform(dff), columns=dff.columns)
+dff.head()
+
+
+# knn'in uygulanması.
+from sklearn.impute import KNNImputer
+
+imputer = KNNImputer(n_neighbors=5)
+dff = pd.DataFrame(imputer.fit_transform(dff), columns=dff.columns)
+dff.head()
+
+dff = pd.DataFrame(scaler.inverse_transform(dff), columns=dff.columns)
+
+df["age_imputed_knn"] = dff[["Age"]]
+
+df.loc[df["Age"].isnull(), ["Age", "age_imputed_knn"]]
+df.loc[df["Age"].isnull()]
+
+
+###################
+# Recap
+###################
+
+df = load()
+# missing table
+missing_values_table(df)
+# sayısal değişkenleri direk median ile oldurma
+df.apply(lambda x: x.fillna(x.median()) if x.dtype != "O" else x, axis=0).isnull().sum()
+# kategorik değişkenleri mode ile doldurma
+df.apply(
+    lambda x: x.fillna(x.mode()[0])
+    if (x.dtype == "O" and len(x.unique()) <= 10)
+    else x,
+    axis=0,
+).isnull().sum()
+# kategorik değişken kırılımında sayısal değişkenleri doldurmak
+df["Age"].fillna(df.groupby("Sex")["Age"].transform("mean")).isnull().sum()
+# Tahmine Dayalı Atama ile Doldurma
+
+
+#############################################
+# Gelişmiş Analizler
+#############################################
+
+###################
+# Eksik Veri Yapısının İncelenmesi
+###################
+
+msno.bar(df)
+plt.show()
+
+msno.matrix(df)
+plt.show()
+
+msno.heatmap(df)
+plt.show()
+
+###################
+# Eksik Değerlerin Bağımlı Değişken ile İlişkisinin İncelenmesi
+###################
+
+missing_values_table(df, True)
+na_cols = missing_values_table(df, True)
+
+
+def missing_vs_target(dataframe, target, na_columns):
+    temp_df = dataframe.copy()
+
+    for col in na_columns:
+        temp_df[col + "_NA_FLAG"] = np.where(temp_df[col].isnull(), 1, 0)
+
+    na_flags = temp_df.loc[:, temp_df.columns.str.contains("_NA_")].columns
+
+    for col in na_flags:
+        print(
+            pd.DataFrame(
+                {
+                    "TARGET_MEAN": temp_df.groupby(col)[target].mean(),
+                    "Count": temp_df.groupby(col)[target].count(),
+                }
+            ),
+            end="\n\n\n",
+        )
+
+
+missing_vs_target(df, "Survived", na_cols)
+
+
+###################
+# Recap
+###################
+
+df = load()
+na_cols = missing_values_table(df, True)
+# sayısal değişkenleri direk median ile oldurma
+df.apply(lambda x: x.fillna(x.median()) if x.dtype != "O" else x, axis=0).isnull().sum()
+# kategorik değişkenleri mode ile doldurma
+df.apply(
+    lambda x: x.fillna(x.mode()[0])
+    if (x.dtype == "O" and len(x.unique()) <= 10)
+    else x,
+    axis=0,
+).isnull().sum()
+# kategorik değişken kırılımında sayısal değişkenleri doldurmak
+df["Age"].fillna(df.groupby("Sex")["Age"].transform("mean")).isnull().sum()
+# Tahmine Dayalı Atama ile Doldurma
+missing_vs_target(df, "Survived", na_cols)
