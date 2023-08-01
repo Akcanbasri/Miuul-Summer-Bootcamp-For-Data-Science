@@ -27,7 +27,7 @@ pd.set_option("display.width", 500)
 
 
 def load_application_train():
-    data = pd.read_csv("./datasets/application_train.csv")
+    data = pd.read_csv("./data/application_train.csv")
     return data
 
 
@@ -36,7 +36,7 @@ df.head()
 
 
 def load():
-    data = pd.read_csv("datasets/titanic.csv")
+    data = pd.read_csv("./data/titanic.csv")
     return data
 
 
@@ -621,3 +621,60 @@ df.apply(
 df["Age"].fillna(df.groupby("Sex")["Age"].transform("mean")).isnull().sum()
 # Tahmine Dayalı Atama ile Doldurma
 missing_vs_target(df, "Survived", na_cols)
+
+#############################################
+# 3. Encoding (Label Encoding, One-Hot Encoding, Rare Encoding)
+#############################################
+
+#############################################
+# Label Encoding & Binary Encoding
+#############################################
+
+df = load()
+df.head()
+df["Sex"].head()
+
+le = LabelEncoder()
+le.fit_transform(df["Sex"])[0:5]
+le.inverse_transform([0, 1])
+
+
+def label_encoder(dataframe, binary_col):
+    labelencoder = LabelEncoder()
+    dataframe[binary_col] = labelencoder.fit_transform(dataframe[binary_col])
+    return dataframe
+
+
+df = load()
+
+binary_cols = [
+    col
+    for col in df.columns
+    if df[col].dtype not in [int, float] and df[col].nunique() == 2
+]
+
+for col in binary_cols:
+    label_encoder(df, col)
+
+df.head()
+
+df = load_application_train()
+df.shape
+
+binary_cols = [
+    col
+    for col in df.columns
+    if df[col].dtype not in [int, float] and df[col].nunique() == 2
+]
+
+df[binary_cols].head()
+
+
+for col in binary_cols:
+    label_encoder(df, col)
+
+
+df = load()
+df["Embarked"].value_counts()
+df["Embarked"].nunique()
+len(df["Embarked"].unique())
