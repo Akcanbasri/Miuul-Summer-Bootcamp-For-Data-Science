@@ -8,7 +8,7 @@ import seaborn as sns
 def check_df(data_frame, head=5):
     """
     This function takes a pandas dataframe and prints out its shape, data types, head, tail, number of missing values, and descriptive statistics.
-    
+
     Parameters:
     data_frame (pandas.DataFrame): The dataframe to be checked.
     head (int): The number of rows to be displayed for head and tail. Default is 5.
@@ -145,17 +145,17 @@ def cat_summary(data_frame, colm_name, plot=False):
 # num cols için özet istatistikler
 def num_summary(dataframe, num_cols, plot=False):
     """
-    This function takes a pandas dataframe and a list of numerical column names as input and returns a summary of the 
-    numerical columns including count, mean, standard deviation, minimum, 5th percentile, 10th percentile, 20th percentile, 
-    30th percentile, 40th percentile, 50th percentile (median), 60th percentile, 70th percentile, 80th percentile, 90th 
-    percentile, 95th percentile, 99th percentile and maximum. If plot is set to True, it also displays a histogram of 
+    This function takes a pandas dataframe and a list of numerical column names as input and returns a summary of the
+    numerical columns including count, mean, standard deviation, minimum, 5th percentile, 10th percentile, 20th percentile,
+    30th percentile, 40th percentile, 50th percentile (median), 60th percentile, 70th percentile, 80th percentile, 90th
+    percentile, 95th percentile, 99th percentile and maximum. If plot is set to True, it also displays a histogram of
     the numerical columns.
-    
+
     Parameters:
     dataframe (pandas.DataFrame): The pandas dataframe to be analyzed.
     num_cols (list): A list of numerical column names to be analyzed.
     plot (bool, optional): Whether to display a histogram of the numerical columns. Defaults to False.
-    
+
     Returns:
     None
     """
@@ -218,7 +218,7 @@ def high_correlated_cols(dataframe, plot=False, corr_th=0.90):
     dataframe (pandas.DataFrame): The input dataframe.
     plot (bool): Whether or not to display a heatmap of the correlation matrix. Default is False.
     corr_th (float): The correlation threshold. Columns with a correlation coefficient greater than this value
-                     will be included in the returned list. Default is 0.90.
+        will be included in the returned list. Default is 0.90.
 
     Returns:
     list: A list of column names that have a correlation coefficient greater than the specified threshold.
