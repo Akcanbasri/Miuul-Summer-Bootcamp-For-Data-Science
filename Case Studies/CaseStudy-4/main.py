@@ -24,26 +24,3 @@ pd.set_option("display.width", 500)
 def load():
     data = pd.read_csv("data\diabetes.csv")
     return data
-
-df = load()
-df.head()
-
-df.columns = [col.upper() for col in df.columns]
-
-def check_df(data_frame, head=5):
-    print("##################### Shape #####################")
-    print(data_frame.shape)
-    print("##################### Types #####################")
-    print(data_frame.dtypes)
-    print("##################### Head #####################")
-    print(data_frame.head(head))
-    print("##################### Tail #####################")
-    print(data_frame.tail(head))
-    print("##################### NA #####################")
-    print(data_frame.isnull().sum())
-    print("##################### Describe #####################")
-    print(data_frame.describe().T)
-
-
-check_df(df)
-
