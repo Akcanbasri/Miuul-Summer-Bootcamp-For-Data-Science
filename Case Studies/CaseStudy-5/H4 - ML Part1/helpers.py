@@ -29,6 +29,27 @@ def check_df(dataframe, head=5):
 
 
 def outlier_thresholds(df, col_name, q1=0.25, q3=0.75):
+    """
+    Calculate the lower and upper limits for outlier detection based on the interquartile range method.
+
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        The dataframe containing the column to calculate the outlier thresholds for.
+    col_name : str
+        The name of the column to calculate the outlier thresholds for.
+    q1 : float, optional
+        The percentile value for the first quartile. Default is 0.25.
+    q3 : float, optional
+        The percentile value for the third quartile. Default is 0.75.
+
+    Returns:
+    --------
+    low_limit : float
+        The lower limit for outlier detection.
+    up_limit : float
+        The upper limit for outlier detection.
+    """
     quartile1 = df[col_name].quantile(q1)
     quartile3 = df[col_name].quantile(q3)
     interquantile_range = quartile3 - quartile1
