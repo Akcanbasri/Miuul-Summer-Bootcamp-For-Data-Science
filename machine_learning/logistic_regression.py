@@ -172,3 +172,31 @@ y_pred = log_model.predict(X)
 y_pred[0:10]
 
 y[0:10]
+
+######################################################
+# Model Evaluation
+######################################################
+
+def plot_confusion_matrix(y, y_pred):
+    acc = round(accuracy_score(y, y_pred), 2)
+    cm = confusion_matrix(y, y_pred)
+    sns.heatmap(cm, annot=True, fmt=".0f")
+    plt.xlabel('y_pred')
+    plt.ylabel('y')
+    plt.title('Accuracy Score: {0}'.format(acc), size=10)
+    plt.show()
+
+plot_confusion_matrix(y, y_pred)
+
+print(classification_report(y, y_pred))
+
+
+# Accuracy: 0.78
+# Precision: 0.74
+# Recall: 0.58
+# F1-score: 0.65
+
+# ROC AUC
+y_prob = log_model.predict_proba(X)[:, 1]
+roc_auc_score(y, y_prob)
+# 0.83939
