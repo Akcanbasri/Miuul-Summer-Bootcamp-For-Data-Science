@@ -80,9 +80,10 @@ def replace_with_thresholds(dataframe, variable):
     dataframe.loc[(dataframe[variable] < low_limit), variable] = low_limit
     dataframe.loc[(dataframe[variable] > up_limit), variable] = up_limit
 
-pd.set_option('display.max_columns', None)
-pd.set_option('display.float_format', lambda x: '%.3f' % x)
-pd.set_option('display.width', 500)
+
+pd.set_option("display.max_columns", None)
+pd.set_option("display.float_format", lambda x: "%.3f" % x)
+pd.set_option("display.width", 500)
 
 df.head()
 df.shape
@@ -113,15 +114,16 @@ def plot_numerical_col(dataframe, numerical_col):
     dataframe[numerical_col].hist(bins=20)
     plt.xlabel(numerical_col)
     plt.show(block=True)
-    
+
+
 for col in df.columns:
-    plot_numerical_col(df, col) 
-    
+    plot_numerical_col(df, col)
+
 cols = [col for col in df.columns if "Outcome" not in col]
 
 for col in cols:
     plot_numerical_col(df, col)
-    
+
 ######################################################
 # Target vs Feature
 ######################################################
@@ -130,10 +132,11 @@ df.groupby("Outcome").agg({"Pregnancies": "mean"})
 
 def target_summary_with_num(dataframe, target, numerical_col):
     print(dataframe.groupby(target).agg({numerical_col: "mean"}), end="\n\n\n")
-    
+
+
 for col in cols:
     target_summary_with_num(df, "Outcome", col)
-    
+
 ######################################################
 # Data Preprocessing
 ######################################################
@@ -145,7 +148,7 @@ df.describe().T
 
 for col in cols:
     print(col, check_outlier(df, col))
-    
+
 
 replace_with_thresholds(df, "Insulin")
 
@@ -177,14 +180,16 @@ y[0:10]
 # Model Evaluation
 ######################################################
 
+
 def plot_confusion_matrix(y, y_pred):
     acc = round(accuracy_score(y, y_pred), 2)
     cm = confusion_matrix(y, y_pred)
     sns.heatmap(cm, annot=True, fmt=".0f")
-    plt.xlabel('y_pred')
-    plt.ylabel('y')
-    plt.title('Accuracy Score: {0}'.format(acc), size=10)
+    plt.xlabel("y_pred")
+    plt.ylabel("y")
+    plt.title("Accuracy Score: {0}".format(acc), size=10)
     plt.show()
+
 
 plot_confusion_matrix(y, y_pred)
 
@@ -200,3 +205,86 @@ print(classification_report(y, y_pred))
 y_prob = log_model.predict_proba(X)[:, 1]
 roc_auc_score(y, y_prob)
 # 0.83939
+
+
+######################################################
+# Model Validation: Holdout
+######################################################
+
+X_test, X_train, y_test, y_train = train_test_split(
+    X, y, test_size=0.20, random_state=17
+)
+
+log_model = LogisticRegression().fit(X_train, y_train)
+
+y_pred = log_model.predict(X_test)
+
+y_prob = log_model.predict_proba(X_test)[:, 1]
+
+print(classification_report(y_test, y_pred))
+
+# Accuracy: 0.78
+# Precision: 0.74
+# Recall: 0.58
+# F1-score: 0.65
+
+# accuracy 0.75
+# precision 0.63
+# recall 0.62
+# f1-score  0.62
+
+RocCurveDisplay.from_estimator(log_model, X_test, y_test)
+plt.title("ROC Curve")
+plt.plot([0, 1], [0, 1], "r--")
+plt.show()
+
+roc_auc_score(y_test, y_prob)
+# 0.83939
+# 0.8003716204297154
+
+######################################################
+# Model Validation: 10-Fold Cross Validation
+######################################################
+
+X = df.drop(["Outcome"], axis=1)
+y = df["Outcome"]
+
+
+log_model = LogisticRegression().fit(X, y)
+
+cv_results = cross_validate(
+    log_model, X, y, cv=5, scoring=["accuracy", "precision", "recall", "f1", "roc_auc"]
+)
+
+# Accuracy: 0.78
+# Precision: 0.74
+# Recall: 0.58
+# F1-score: 0.65
+
+# accuracy 0.75
+# precision 0.63
+# recall 0.62
+# f1-score  0.62
+
+cv_results["test_accuracy"].mean()
+# 0.7721925133689839
+
+cv_results["test_precision"].mean()
+# 0.7192472060223519
+
+cv_results["test_recall"].mean()
+# 0.5747030048916841
+
+cv_results["test_f1"].mean()
+# 0.6371421090986309
+
+cv_results["test_roc_auc"].mean()
+# 0.8327295597484277
+
+######################################################
+# Prediction for A New Observation
+######################################################
+X.columns
+
+random_user = X.sample(1, random_state=45)
+log_model.predict(random_user)
