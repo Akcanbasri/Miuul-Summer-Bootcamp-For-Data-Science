@@ -136,8 +136,11 @@ gbm_final = gbm_model.set_params(**gbm_best_grid.best_params_, random_state=17, 
 
 cv_results = cross_validate(gbm_final, X, y, cv=5, scoring=["accuracy", "f1", "roc_auc"])
 cv_results['test_accuracy'].mean()
+# 0.7800186741363212
 cv_results['test_f1'].mean()
+# 0.668605747317776
 cv_results['test_roc_auc'].mean()
+# 0.8257784765897973
 
 
 ################################################
@@ -165,9 +168,11 @@ xgboost_final = xgboost_model.set_params(**xgboost_best_grid.best_params_, rando
 
 cv_results = cross_validate(xgboost_final, X, y, cv=5, scoring=["accuracy", "f1", "roc_auc"])
 cv_results['test_accuracy'].mean()
+# 0.7578643578643579
 cv_results['test_f1'].mean()
+# 0.6297649135382188
 cv_results['test_roc_auc'].mean()
-
+# 0.8145597484276731
 
 
 ################################################
@@ -180,22 +185,29 @@ lgbm_model.get_params()
 cv_results = cross_validate(lgbm_model, X, y, cv=5, scoring=["accuracy", "f1", "roc_auc"])
 
 cv_results['test_accuracy'].mean()
+# 0.7474492827434004
 cv_results['test_f1'].mean()
+# 0.624110522144179
 cv_results['test_roc_auc'].mean()
+# 0.7990293501048218
 
 lgbm_params = {"learning_rate": [0.01, 0.1],
                "n_estimators": [100, 300, 500, 1000],
                "colsample_bytree": [0.5, 0.7, 1]}
 
 lgbm_best_grid = GridSearchCV(lgbm_model, lgbm_params, cv=5, n_jobs=-1, verbose=True).fit(X, y)
+lgbm_best_grid.best_params_
 
 lgbm_final = lgbm_model.set_params(**lgbm_best_grid.best_params_, random_state=17).fit(X, y)
 
 cv_results = cross_validate(lgbm_final, X, y, cv=5, scoring=["accuracy", "f1", "roc_auc"])
 
 cv_results['test_accuracy'].mean()
+# 0.7643578643578645
 cv_results['test_f1'].mean()
+# 0.6372062920577772
 cv_results['test_roc_auc'].mean()
+# 0.8147491264849755
 
 # Hiperparametre yeni değerlerle
 lgbm_params = {"learning_rate": [0.01, 0.02, 0.05, 0.1],
@@ -205,13 +217,16 @@ lgbm_params = {"learning_rate": [0.01, 0.02, 0.05, 0.1],
 lgbm_best_grid = GridSearchCV(lgbm_model, lgbm_params, cv=5, n_jobs=-1, verbose=True).fit(X, y)
 
 lgbm_final = lgbm_model.set_params(**lgbm_best_grid.best_params_, random_state=17).fit(X, y)
+lgbm_best_grid.best_params_
 
 cv_results = cross_validate(lgbm_final, X, y, cv=5, scoring=["accuracy", "f1", "roc_auc"])
 
 cv_results['test_accuracy'].mean()
+# 0.7643833290892115
 cv_results['test_f1'].mean()
+# 0.6193071162618689
 cv_results['test_roc_auc'].mean()
-
+# 0.8227931516422082
 
 # Hiperparametre optimizasyonu sadece n_estimators için.
 lgbm_model = LGBMClassifier(random_state=17, colsample_bytree=0.9, learning_rate=0.01)
@@ -225,8 +240,11 @@ lgbm_final = lgbm_model.set_params(**lgbm_best_grid.best_params_, random_state=1
 cv_results = cross_validate(lgbm_final, X, y, cv=5, scoring=["accuracy", "f1", "roc_auc"])
 
 cv_results['test_accuracy'].mean()
+# 0.7643833290892115
 cv_results['test_f1'].mean()
+# 0.6193071162618689
 cv_results['test_roc_auc'].mean()
+# 0.8227931516422082
 
 
 ################################################
@@ -238,8 +256,11 @@ catboost_model = CatBoostClassifier(random_state=17, verbose=False)
 cv_results = cross_validate(catboost_model, X, y, cv=5, scoring=["accuracy", "f1", "roc_auc"])
 
 cv_results['test_accuracy'].mean()
+# 0.7735251676428148
 cv_results['test_f1'].mean()
+# 0.6502723851348231
 cv_results['test_roc_auc'].mean()
+# 0.8378923829489867
 
 
 catboost_params = {"iterations": [200, 500],
@@ -250,12 +271,16 @@ catboost_params = {"iterations": [200, 500],
 catboost_best_grid = GridSearchCV(catboost_model, catboost_params, cv=5, n_jobs=-1, verbose=True).fit(X, y)
 
 catboost_final = catboost_model.set_params(**catboost_best_grid.best_params_, random_state=17).fit(X, y)
+catboost_best_grid.best_params_
 
 cv_results = cross_validate(catboost_final, X, y, cv=5, scoring=["accuracy", "f1", "roc_auc"])
 
 cv_results['test_accuracy'].mean()
+# 0.7721755368814192
 cv_results['test_f1'].mean()
+# 0.6322580676028952
 cv_results['test_roc_auc'].mean()
+# 0.842001397624039
 
 
 ################################################
@@ -311,8 +336,11 @@ rf_random_final = rf_model.set_params(**rf_random.best_params_, random_state=17)
 cv_results = cross_validate(rf_random_final, X, y, cv=5, scoring=["accuracy", "f1", "roc_auc"])
 
 cv_results['test_accuracy'].mean()
+# 0.7761225702402172
 cv_results['test_f1'].mean()
+0.6476828661140268
 cv_results['test_roc_auc'].mean()
+# 0.8329608665269042
 
 
 ################################
