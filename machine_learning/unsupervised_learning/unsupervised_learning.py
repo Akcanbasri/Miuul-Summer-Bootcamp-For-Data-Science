@@ -22,7 +22,7 @@ from sklearn.preprocessing import LabelEncoder
 # K-Means
 ################################
 
-df = pd.read_csv("datasets/USArrests.csv", index_col=0)
+df = pd.read_csv("./USArrests.csv", index_col=0)
 
 df.head()
 df.isnull().sum()
@@ -39,7 +39,7 @@ kmeans.get_params()
 kmeans.n_clusters
 kmeans.cluster_centers_
 kmeans.labels_
-kmeans.inertia_
+kmeans.inertia_ # Sum of squared distances of samples to their closest cluster center(SSD).
 
 ################################
 # Optimum Küme Sayısının Belirlenmesi
@@ -69,7 +69,7 @@ elbow.elbow_value_
 # Final Cluster'ların Oluşturulması
 ################################
 
-kmeans = KMeans(n_clusters=elbow.elbow_value_).fit(df)
+kmeans = KMeans(n_clusters=elbow.elbow_value_).fit(df)  
 
 kmeans.n_clusters
 kmeans.cluster_centers_
@@ -78,7 +78,7 @@ df[0:5]
 
 clusters_kmeans = kmeans.labels_
 
-df = pd.read_csv("datasets/USArrests.csv", index_col=0)
+df = pd.read_csv("USArrests.csv", index_col=0)
 
 df["cluster"] = clusters_kmeans
 
@@ -86,9 +86,9 @@ df.head()
 
 df["cluster"] = df["cluster"] + 1
 
-df[df["cluster"]==5]
+df[df["cluster"] == 5]
 
-df.groupby("cluster").agg(["count","mean","median"])
+df.groupby("cluster").agg(["count", "mean", "median"])
 
 df.to_csv("clusters.csv")
 
@@ -108,8 +108,7 @@ plt.figure(figsize=(10, 5))
 plt.title("Hiyerarşik Kümeleme Dendogramı")
 plt.xlabel("Gözlem Birimleri")
 plt.ylabel("Uzaklıklar")
-dendrogram(hc_average,
-           leaf_font_size=10)
+dendrogram(hc_average, leaf_font_size=10)
 plt.show()
 
 
@@ -117,11 +116,9 @@ plt.figure(figsize=(7, 5))
 plt.title("Hiyerarşik Kümeleme Dendogramı")
 plt.xlabel("Gözlem Birimleri")
 plt.ylabel("Uzaklıklar")
-dendrogram(hc_average,
-           truncate_mode="lastp",
-           p=10,
-           show_contracted=True,
-           leaf_font_size=10)
+dendrogram(
+    hc_average, truncate_mode="lastp", p=10, show_contracted=True, leaf_font_size=10
+)
 plt.show()
 
 ################################
@@ -132,8 +129,8 @@ plt.show()
 plt.figure(figsize=(7, 5))
 plt.title("Dendrograms")
 dend = dendrogram(hc_average)
-plt.axhline(y=0.5, color='r', linestyle='--')
-plt.axhline(y=0.6, color='b', linestyle='--')
+plt.axhline(y=0.5, color="r", linestyle="--")
+plt.axhline(y=0.6, color="b", linestyle="--")
 plt.show()
 
 ################################
@@ -151,7 +148,7 @@ df["hi_cluster_no"] = clusters
 
 df["hi_cluster_no"] = df["hi_cluster_no"] + 1
 
-df["kmeans_cluster_no"] = df["kmeans_cluster_no"]  + 1
+df["kmeans_cluster_no"] = df["kmeans_cluster_no"] + 1
 df["kmeans_cluster_no"] = clusters_kmeans
 
 
@@ -214,22 +211,25 @@ len(num_cols)
 
 others = [col for col in df.columns if col not in num_cols]
 
-pd.DataFrame(pca_fit, columns=["PC1","PC2","PC3"]).head()
+pd.DataFrame(pca_fit, columns=["PC1", "PC2", "PC3"]).head()
 
 df[others].head()
 
-final_df = pd.concat([pd.DataFrame(pca_fit, columns=["PC1","PC2","PC3"]),
-                      df[others]], axis=1)
+final_df = pd.concat(
+    [pd.DataFrame(pca_fit, columns=["PC1", "PC2", "PC3"]), df[others]], axis=1
+)
 final_df.head()
 
 
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 
+
 def label_encoder(dataframe, binary_col):
     labelencoder = LabelEncoder()
     dataframe[binary_col] = labelencoder.fit_transform(dataframe[binary_col])
     return dataframe
+
 
 for col in ["NewLeague", "Division", "League"]:
     label_encoder(final_df, col)
@@ -240,26 +240,31 @@ y = final_df["Salary"]
 X = final_df.drop(["Salary"], axis=1)
 
 lm = LinearRegression()
-rmse = np.mean(np.sqrt(-cross_val_score(lm, X, y, cv=5, scoring="neg_mean_squared_error")))
+rmse = np.mean(
+    np.sqrt(-cross_val_score(lm, X, y, cv=5, scoring="neg_mean_squared_error"))
+)
 y.mean()
 
 
 cart = DecisionTreeRegressor()
-rmse = np.mean(np.sqrt(-cross_val_score(cart, X, y, cv=5, scoring="neg_mean_squared_error")))
+rmse = np.mean(
+    np.sqrt(-cross_val_score(cart, X, y, cv=5, scoring="neg_mean_squared_error"))
+)
 
-cart_params = {'max_depth': range(1, 11),
-               "min_samples_split": range(2, 20)}
+cart_params = {"max_depth": range(1, 11), "min_samples_split": range(2, 20)}
 
 # GridSearchCV
-cart_best_grid = GridSearchCV(cart,
-                              cart_params,
-                              cv=5,
-                              n_jobs=-1,
-                              verbose=True).fit(X, y)
+cart_best_grid = GridSearchCV(cart, cart_params, cv=5, n_jobs=-1, verbose=True).fit(
+    X, y
+)
 
-cart_final = DecisionTreeRegressor(**cart_best_grid.best_params_, random_state=17).fit(X, y)
+cart_final = DecisionTreeRegressor(**cart_best_grid.best_params_, random_state=17).fit(
+    X, y
+)
 
-rmse = np.mean(np.sqrt(-cross_val_score(cart_final, X, y, cv=5, scoring="neg_mean_squared_error")))
+rmse = np.mean(
+    np.sqrt(-cross_val_score(cart_final, X, y, cv=5, scoring="neg_mean_squared_error"))
+)
 
 
 ################################
@@ -270,8 +275,8 @@ rmse = np.mean(np.sqrt(-cross_val_score(cart_final, X, y, cv=5, scoring="neg_mea
 # Breast Cancer
 ################################
 
-pd.set_option('display.max_columns', None)
-pd.set_option('display.width', 500)
+pd.set_option("display.max_columns", None)
+pd.set_option("display.width", 500)
 
 df = pd.read_csv("datasets/breast_cancer.csv")
 
@@ -283,28 +288,33 @@ def create_pca_df(X, y):
     X = StandardScaler().fit_transform(X)
     pca = PCA(n_components=2)
     pca_fit = pca.fit_transform(X)
-    pca_df = pd.DataFrame(data=pca_fit, columns=['PC1', 'PC2'])
+    pca_df = pd.DataFrame(data=pca_fit, columns=["PC1", "PC2"])
     final_df = pd.concat([pca_df, pd.DataFrame(y)], axis=1)
     return final_df
 
+
 pca_df = create_pca_df(X, y)
+
 
 def plot_pca(dataframe, target):
     fig = plt.figure(figsize=(7, 5))
     ax = fig.add_subplot(1, 1, 1)
-    ax.set_xlabel('PC1', fontsize=15)
-    ax.set_ylabel('PC2', fontsize=15)
-    ax.set_title(f'{target.capitalize()} ', fontsize=20)
+    ax.set_xlabel("PC1", fontsize=15)
+    ax.set_ylabel("PC2", fontsize=15)
+    ax.set_title(f"{target.capitalize()} ", fontsize=20)
 
     targets = list(dataframe[target].unique())
-    colors = random.sample(['r', 'b', "g", "y"], len(targets))
+    colors = random.sample(["r", "b", "g", "y"], len(targets))
 
     for t, color in zip(targets, colors):
         indices = dataframe[target] == t
-        ax.scatter(dataframe.loc[indices, 'PC1'], dataframe.loc[indices, 'PC2'], c=color, s=50)
+        ax.scatter(
+            dataframe.loc[indices, "PC1"], dataframe.loc[indices, "PC2"], c=color, s=50
+        )
     ax.legend(targets)
     ax.grid()
     plt.show()
+
 
 plot_pca(pca_df, "diagnosis")
 
@@ -314,6 +324,7 @@ plot_pca(pca_df, "diagnosis")
 ################################
 
 import seaborn as sns
+
 df = sns.load_dataset("iris")
 
 y = df["species"]
@@ -336,23 +347,3 @@ X = df.drop(["Outcome"], axis=1)
 pca_df = create_pca_df(X, y)
 
 plot_pca(pca_df, "Outcome")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
