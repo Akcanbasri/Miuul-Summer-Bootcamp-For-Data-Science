@@ -39,7 +39,7 @@ kmeans.get_params()
 kmeans.n_clusters
 kmeans.cluster_centers_
 kmeans.labels_
-kmeans.inertia_ # Sum of squared distances of samples to their closest cluster center(SSD).
+kmeans.inertia_  # Sum of squared distances of samples to their closest cluster center(SSD).
 
 ################################
 # Optimum Küme Sayısının Belirlenmesi
@@ -69,7 +69,7 @@ elbow.elbow_value_
 # Final Cluster'ların Oluşturulması
 ################################
 
-kmeans = KMeans(n_clusters=elbow.elbow_value_).fit(df)  
+kmeans = KMeans(n_clusters=elbow.elbow_value_).fit(df)
 
 kmeans.n_clusters
 kmeans.cluster_centers_
@@ -97,7 +97,7 @@ df.to_csv("clusters.csv")
 # Hierarchical Clustering
 ################################
 
-df = pd.read_csv("datasets/USArrests.csv", index_col=0)
+df = pd.read_csv("USArrests.csv", index_col=0)
 
 sc = MinMaxScaler((0, 1))
 df = sc.fit_transform(df)
@@ -143,20 +143,20 @@ cluster = AgglomerativeClustering(n_clusters=5, linkage="average")
 
 clusters = cluster.fit_predict(df)
 
-df = pd.read_csv("datasets/USArrests.csv", index_col=0)
+df = pd.read_csv("./clusters.csv", index_col=0)
 df["hi_cluster_no"] = clusters
+df.head()
 
 df["hi_cluster_no"] = df["hi_cluster_no"] + 1
 
-df["kmeans_cluster_no"] = df["kmeans_cluster_no"] + 1
-df["kmeans_cluster_no"] = clusters_kmeans
+df.head()
 
 
 ################################
 # Principal Component Analysis
 ################################
 
-df = pd.read_csv("datasets/Hitters.csv")
+df = pd.read_csv("Hitters.csv")
 df.head()
 
 num_cols = [col for col in df.columns if df[col].dtypes != "O" and "Salary" not in col]
@@ -201,7 +201,7 @@ np.cumsum(pca.explained_variance_ratio_)
 # BONUS: Principal Component Regression
 ################################
 
-df = pd.read_csv("datasets/Hitters.csv")
+df = pd.read_csv("Hitters.csv")
 df.shape
 
 len(pca_fit)
@@ -278,7 +278,7 @@ rmse = np.mean(
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", 500)
 
-df = pd.read_csv("datasets/breast_cancer.csv")
+df = pd.read_csv("breast_cancer.csv")
 
 y = df["diagnosis"]
 X = df.drop(["diagnosis", "id"], axis=1)
@@ -339,7 +339,7 @@ plot_pca(pca_df, "species")
 # Diabetes
 ################################
 
-df = pd.read_csv("datasets/diabetes.csv")
+df = pd.read_csv("diabetes.csv")
 
 y = df["Outcome"]
 X = df.drop(["Outcome"], axis=1)
