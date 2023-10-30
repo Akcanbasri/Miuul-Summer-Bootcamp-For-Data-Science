@@ -376,18 +376,18 @@ check_df(X)
 
 
 def base_models(X, y, scoring="roc_auc"):
-    print("Base Models....")
+    print(f"Base Models....\n**********{scoring}**********")
     classifiers = [
         ("LR", LogisticRegression()),
-        ("KNN", KNeighborsClassifier()),
+        # ("KNN", KNeighborsClassifier()),
         ("SVC", SVC()),
         ("CART", DecisionTreeClassifier()),
         ("RF", RandomForestClassifier()),
         ("Adaboost", AdaBoostClassifier()),
         ("GBM", GradientBoostingClassifier()),
-        ("XGBoost", XGBClassifier(use_label_encoder=False, eval_metric="logloss")),
+        ("XGBoost", XGBClassifier(eval_metric="logloss")),
         ("LightGBM", LGBMClassifier()),
-        # ('CatBoost', CatBoostClassifier(verbose=False))
+        ("CatBoost", CatBoostClassifier(verbose=False)),
     ]
 
     for name, classifier in classifiers:
@@ -395,7 +395,7 @@ def base_models(X, y, scoring="roc_auc"):
         print(f"{scoring}: {round(cv_results['test_score'].mean(), 4)} ({name}) ")
 
 
-base_models(X, y, scoring="accuracy")
+base_models(X, y, scoring="f1")
 
 
 ######################################################
@@ -428,7 +428,7 @@ classifiers = [
     ("RF", RandomForestClassifier(), rf_params),
     (
         "XGBoost",
-        XGBClassifier(use_label_encoder=False, eval_metric="logloss"),
+        XGBClassifier(eval_metric="logloss"),
         xgboost_params,
     ),
     ("LightGBM", LGBMClassifier(), lightgbm_params),
@@ -436,7 +436,7 @@ classifiers = [
 
 
 def hyperparameter_optimization(X, y, cv=3, scoring="roc_auc"):
-    print("Hyperparameter Optimization....")
+    print(f"Hyperparameter Optimization....")
     best_models = {}
     for name, classifier, params in classifiers:
         print(f"########## {name} ##########")
