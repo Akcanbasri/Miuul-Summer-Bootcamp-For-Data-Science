@@ -645,6 +645,11 @@ def label_encoder(dataframe, binary_col):
     dataframe[binary_col] = labelencoder.fit_transform(dataframe[binary_col])
     return dataframe
 
+def one_hot_encoder(dataframe, categorical_cols, drop_first=True):
+    dataframe = pd.get_dummies(
+        dataframe, columns=categorical_cols, drop_first=drop_first
+    )
+    return dataframe
 
 df = load()
 
@@ -697,11 +702,7 @@ pd.get_dummies(df, columns=["Embarked"], dummy_na=True).head()
 pd.get_dummies(df, columns=["Sex", "Embarked"], drop_first=True).head()
 
 
-def one_hot_encoder(dataframe, categorical_cols, drop_first=True):
-    dataframe = pd.get_dummies(
-        dataframe, columns=categorical_cols, drop_first=drop_first
-    )
-    return dataframe
+
 
 
 df = load()
